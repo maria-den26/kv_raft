@@ -19,34 +19,34 @@
 - `pom.xml` — Maven-конфигурация
 
 - `src/main/java/org/example/`
-          - `kv/`
-            - `KeyValueCommand.java` — команды для KV-хранилища (PUT, DELETE)
-            - `KeyValueResult.java` — результат выполнения команд
-            - `KeyValueStateMachine.java` — бизнес-логика state machine
-          - `raft/`
-            - `RaftNode.java` — основной узел Raft
-            - `RaftState.java` — внутренние состояния узла
-            - `StateMachine.java` — интерфейс state machine
-            - `NotLeaderException.java` — ошибка для не-лидера
-            - `log/`
-              - `LogEntry.java` — лог записи Raft
-            - `protocol/`
-              - `AppendEntriesRequest.java`, `AppendEntriesResponse.java` — синхронизация лога
-              - `RequestVoteRequest.java`, `RequestVoteResponse.java` — голосования при выборах
-            - `cluster/`
-              - `ClusterConfig.java` — конфигурация кластера
-              - `PeerEndpoint.java` — адресация узлов
-            - `transport/`
-              - `RaftTransport.java` — абстракция транспорта
-              - `HttpRaftTransport.java` — HTTP-транспорт
-            - `util/`
-              - `Json.java` — утилиты сериализации
-          - `server/`
-            - `RaftHttpServer.java` — HTTP-сервер кластера
-          - `Main.java` — точка входа
+  - `kv/`
+    - `KeyValueCommand.java` — команды для KV-хранилища (PUT, DELETE)
+    - `KeyValueResult.java` — результат выполнения команд
+    - `KeyValueStateMachine.java` — бизнес-логика state machine
+  - `raft/`
+    - `RaftNode.java` — основной узел Raft
+    - `RaftState.java` — внутренние состояния узла
+    - `StateMachine.java` — интерфейс state machine
+    - `NotLeaderException.java` — ошибка для не-лидера
+    - `log/`
+      - `LogEntry.java` — лог записи Raft
+    - `protocol/`
+      - `AppendEntriesRequest.java`, `AppendEntriesResponse.java` — синхронизация лога
+      - `RequestVoteRequest.java`, `RequestVoteResponse.java` — голосования при выборах
+    - `cluster/`
+      - `ClusterConfig.java` — конфигурация кластера
+      - `PeerEndpoint.java` — адресация узлов
+    - `transport/`
+      - `RaftTransport.java` — абстракция транспорта
+      - `HttpRaftTransport.java` — HTTP-транспорт
+    - `util/`
+      - `Json.java` — утилиты сериализации
+  - `server/`
+    - `RaftHttpServer.java` — HTTP-сервер кластера
+  - `Main.java` — точка входа
   - `src/test/java/org/example/`
-          - `kv/`
-            - `KeyValueStateMachineTest.java` — тесты state machine
+    - `kv/`
+       - `KeyValueStateMachineTest.java` — тесты state machine
 ---
 
 ### Запуск с Docker
