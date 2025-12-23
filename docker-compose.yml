@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  node1:
+    build: .
+    container_name: raft-node1
+    hostname: node1
+    ports:
+      - "9001:9001"
+    command:
+      - --id
+      - node1
+      - --host
+      - 0.0.0.0
+      - --port
+      - "9001"
+      - --peers
+      - node2=node2:9002,node3=node3:9003,node4=node4:9004
+    networks:
+      - raft-network
+    restart: unless-stopped
+
+  node2:
+    build: .
+    container_name: raft-node2
+    hostname: node2
+    ports:
+      - "9002:9002"
+    command:
+      - --id
+      - node2
+      - --host
+      - 0.0.0.0
+      - --port
+      - "9002"
+      - --peers
+      - node1=node1:9001,node3=node3:9003,node4=node4:9004
+    networks:
+      - raft-network
+    restart: unless-stopped
+
+  node3:
+    build: .
+    container_name: raft-node3
+    hostname: node3
+    ports:
+      - "9003:9003"
+    command:
+      - --id
+      - node3
+      - --host
+      - 0.0.0.0
+      - --port
+      - "9003"
+      - --peers
+      - node1=node1:9001,node2=node2:9002,node4=node4:9004
+    networks:
+      - raft-network
+    restart: unless-stopped
+
+  node4:
+    build: .
+    container_name: raft-node4
+    hostname: node4
+    ports:
+      - "9004:9004"
+    command:
+      - --id
+      - node4
+      - --host
+      - 0.0.0.0
+      - --port
+      - "9004"
+      - --peers
+      - node1=node1:9001,node2=node2:9002,node3=node3:9003
+    networks:
+      - raft-network
+    restart: unless-stopped
+
+networks:
+  raft-network:
+    driver: bridge
+
+
+
