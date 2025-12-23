@@ -6,59 +6,52 @@
 
 ### Алгоритм Raft
 
+---
+
 ## Структура проекта
 
-- `docker-compose.yml`, `Dockerfile` — конфигурация для запуска проекта в контейнере и/или кластере.
-- `pom.xml` — Maven-конфигурация для сборки, зависимостей и тестов.
+- `docker-compose.yml`, `Dockerfile` — контейнеризация и кластерный запуск  
+- `pom.xml` — Maven-конфигурация
 
-### src/main/java/org/example:
-<details>
-<summary><b>kv/</b></summary>
+- `src/`
+  - `main/`
+    - `java/`
+      - `org/`
+        - `example/`
+          - `kv/`
+            - `KeyValueCommand.java` — команды для KV-хранилища (PUT, DELETE)
+            - `KeyValueResult.java` — результат выполнения команд
+            - `KeyValueStateMachine.java` — бизнес-логика state machine
+          - `raft/`
+            - `RaftNode.java` — основной узел Raft
+            - `RaftState.java` — внутренние состояния узла
+            - `StateMachine.java` — интерфейс state machine
+            - `NotLeaderException.java` — ошибка для не-лидера
+            - `log/`
+              - `LogEntry.java` — лог записи Raft
+            - `protocol/`
+              - `AppendEntriesRequest.java`, `AppendEntriesResponse.java` — синхронизация лога
+              - `RequestVoteRequest.java`, `RequestVoteResponse.java` — голосования при выборах
+            - `cluster/`
+              - `ClusterConfig.java` — конфигурация кластера
+              - `PeerEndpoint.java` — адресация узлов
+            - `transport/`
+              - `RaftTransport.java` — абстракция транспорта
+              - `HttpRaftTransport.java` — HTTP-транспорт
+            - `util/`
+              - `Json.java` — утилиты сериализации
+          - `server/`
+            - `RaftHttpServer.java` — HTTP-сервер кластера
+          - `Main.java` — точка входа
+    - `resources/` — ресурсы приложения
+  - `test/`
+    - `java/`
+      - `org/`
+        - `example/`
+          - `kv/`
+            - `KeyValueStateMachineTest.java` — тесты state machine
 
-- `KeyValueCommand.java` — команды для управления хранилищем (например, PUT, DELETE).
-- `KeyValueResult.java` — результат выполнения команд.
-- `KeyValueStateMachine.java` — реализация прикладной state machine для хранения и обработки команд key-value.
-
-</details>
-
-<details>
-<summary><b>raft/</b></summary>
-
-- `RaftNode.java` — основной класс-узел Raft, реализующий протокол.
-- `RaftState.java` — внутреннее состояние узла Raft.
-- `StateMachine.java` — абстракция для конечных автоматов.
-
-  - **log/**
-    - `LogEntry.java` — лог записей протокола Raft.
-  - **protocol/**
-    - `AppendEntriesRequest/Response.java`, `RequestVoteRequest/Response.java` — сетевые сообщения протокола Raft.
-  - **cluster/**
-    - `ClusterConfig.java`, `PeerEndpoint.java` — определение конфигураций и адресов узлов кластера.
-  - **transport/**
-    - `RaftTransport.java` — абстракция транспортного уровня (между узлами).
-    - `HttpRaftTransport.java` — реализация транспорта через HTTP.
-  - **util/**
-    - `Json.java` — вспомогательные методы для (де-)сериализации.
-  - `NotLeaderException.java` — исключение при ошибках лидерства.
-
-</details>
-
-<details>
-<summary><b>server/</b></summary>
-
-- `RaftHttpServer.java` — HTTP сервер для доступа к кластеру, хранилищу и управления.
-
-</details>
-
-- `Main.java` — точка входа в приложение.
-
-### src/test/java/org/example:
-<details>
-<summary><b>kv/</b></summary>
-
-- `KeyValueStateMachineTest.java` — тестирование работы state machine key-value.
-
-</details>
+- `target/` — артефакты сборки (компилированные файлы)
 
 ---
 
