@@ -40,7 +40,8 @@ public final class KeyValueStateMachine implements StateMachine {
             }
             return mapper.writeValueAsBytes(result); // Сериализация результата выполнения команды в JSON
         } catch (Exception e) {
-            return ("error:" + e.getMessage()).getBytes(StandardCharsets.UTF_8);
+            String message = e.getMessage();
+            return ("error:" + (message != null ? message : "null")).getBytes(StandardCharsets.UTF_8);
         }
     }
 }

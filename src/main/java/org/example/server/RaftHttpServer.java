@@ -33,7 +33,9 @@ import java.util.concurrent.TimeUnit;
 public final class RaftHttpServer implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RaftHttpServer.class);
-    private static final long CLIENT_TIMEOUT_MILLIS = 5_000;
+    private static final long CLIENT_TIMEOUT_MILLIS = Long.parseLong(
+        System.getProperty("raft.client.timeout", "5000")
+    );
 
     private final Server server;
     private final RaftNode node;
@@ -134,7 +136,8 @@ public final class RaftHttpServer implements Closeable {
             writeJson(response, 409, payload);
         } catch (Exception e) {
             LOGGER.error("write failed", e);
-            writeBytes(response, 500, ("error:" + e.getMessage()).getBytes(StandardCharsets.UTF_8));
+            String message = e.getMessage();
+            writeBytes(response, 500, ("error:" + (message != null ? message : "null")).getBytes(StandardCharsets.UTF_8));
         }
     }
 
@@ -143,7 +146,8 @@ public final class RaftHttpServer implements Closeable {
             byte[] result = node.readFromStateMachine(mapper.writeValueAsBytes(command));
             writeBytes(response, 200, result);
         } catch (Exception e) {
-            writeBytes(response, 500, ("error:" + e.getMessage()).getBytes(StandardCharsets.UTF_8));
+            String message = e.getMessage();
+            writeBytes(response, 500, ("error:" + (message != null ? message : "null")).getBytes(StandardCharsets.UTF_8));
         }
     }
 

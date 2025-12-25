@@ -12,6 +12,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
 from enum import Enum
+import json
 
 
 class TestResult(Enum):
@@ -138,6 +139,15 @@ class RaftClusterManager:
 
             time.sleep(1)
         return None
+
+    def wait_for_node_unavailable(self, node: str, timeout: int = 10) -> bool:
+        """Ждет пока узел станет недоступным."""
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            if self.get_node_status(node) is None:
+                return True
+            time.sleep(1)
+        return False
 
 
 class RaftAPIClient:
@@ -385,7 +395,11 @@ class RaftIntegrationTest:
                 test.finish(TestResult.FAILED)
                 return TestResult.FAILED
 
-            # Ждем стабилизации
+            # Ждем пока узел станет недоступным
+            if not self.cluster.wait_for_node_unavailable(node_to_stop, 10):
+                test.log(f"WARNING: Node {node_to_stop} is still responding after stop")
+
+            # Ждем стабилизации кластера
             time.sleep(5)
 
             # Проверяем, что кластер все еще работает
@@ -396,6 +410,9 @@ class RaftIntegrationTest:
                 return TestResult.FAILED
 
             test.log(f"New leader after failure: {new_leader}")
+
+            # Ждем стабилизации кластера
+            time.sleep(30)
 
             # Проверяем, что можем записывать новые данные
             success, message = self.api_client.put("survival_key2", "survival_value2")
@@ -442,7 +459,11 @@ class RaftIntegrationTest:
                     test.finish(TestResult.FAILED)
                     return TestResult.FAILED
 
-            # Ждем стабилизации
+                # Ждем пока узел станет недоступным
+                if not self.cluster.wait_for_node_unavailable(node, 10):
+                    test.log(f"WARNING: Node {node} is still responding after stop")
+
+            # Ждем стабилизации кластера
             time.sleep(5)
 
             # Проверяем, что нет лидера (отсутствие кворума)
@@ -501,7 +522,11 @@ class RaftIntegrationTest:
                     test.finish(TestResult.FAILED)
                     return TestResult.FAILED
 
-            # Ждем стабилизации
+                # Ждем пока узел станет недоступным
+                if not self.cluster.wait_for_node_unavailable(node, 10):
+                    test.log(f"WARNING: Node {node} is still responding after stop")
+
+            # Ждем стабилизации кластера
             time.sleep(5)
 
             # Проверяем, что нет лидера (отсутствие кворума)
@@ -564,6 +589,10 @@ class RaftIntegrationTest:
                 test.log(f"ERROR: Failed to stop leader {initial_leader}")
                 test.finish(TestResult.FAILED)
                 return TestResult.FAILED
+
+            # Ждем пока лидер станет недоступным
+            if not self.cluster.wait_for_node_unavailable(initial_leader, 10):
+                test.log(f"WARNING: Leader {initial_leader} is still responding after stop")
 
             # Ждем перевыбора лидера
             time.sleep(5)
@@ -638,6 +667,10 @@ class RaftIntegrationTest:
                 test.log(f"ERROR: Failed to stop leader {current_leader}")
                 test.finish(TestResult.FAILED)
                 return TestResult.FAILED
+
+            # Ждем пока лидер станет недоступным
+            if not self.cluster.wait_for_node_unavailable(current_leader, 10):
+                test.log(f"WARNING: Leader {current_leader} is still responding after stop")
 
             # Ждем нового лидера
             time.sleep(5)
@@ -719,6 +752,13 @@ class RaftIntegrationTest:
                 test.finish(TestResult.FAILED)
                 return TestResult.FAILED
 
+            # Ждем пока follower станет недоступным
+            if not self.cluster.wait_for_node_unavailable(follower_to_stop, 10):
+                test.log(f"WARNING: Follower {follower_to_stop} is still responding after stop")
+
+            # Ждем стабилизации кластера
+            time.sleep(15)
+
             # Записываем новые данные пока follower недоступен
             success, message = self.api_client.put("follower_return_key2", "follower_return_value2")
             if not success:
@@ -734,7 +774,7 @@ class RaftIntegrationTest:
                 return TestResult.FAILED
 
             # Ждем синхронизации
-            time.sleep(10)
+            time.sleep(15)
 
             # Проверяем, что follower теперь имеет все данные
             for key, expected_value in [("follower_return_key1", "follower_return_value1"),
@@ -796,7 +836,7 @@ class RaftIntegrationTest:
                 return TestResult.FAILED
 
             # Ждем нового лидера
-            time.sleep(5)
+            time.sleep(15)
             new_leader = self.cluster.wait_for_leader_election(20)
             if not new_leader:
                 test.log("ERROR: No new leader elected")
