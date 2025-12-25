@@ -100,6 +100,16 @@ public final class RaftHttpServer implements Closeable {
                         handleRead(response, command);
                         break;
                     }
+                    // запрос на получение статуса ноды
+                    case "/raft/status": {
+                        Map<String, Object> status = new HashMap<>();
+                        status.put("id", node.getLocalId());
+                        status.put("role", node.getState().toString());
+                        status.put("leader", node.getCurrentLeader());
+                        status.put("term", node.getCurrentTerm());
+                        writeJson(response, 200, status);
+                        break;
+                    }
                     default:
                         response.setStatus(404);
                         break;

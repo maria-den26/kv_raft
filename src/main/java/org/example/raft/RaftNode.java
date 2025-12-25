@@ -74,6 +74,22 @@ public class RaftNode implements AutoCloseable {
         resetElectionTimer();
     }
 
+    public RaftState getState() {
+        return state;
+    }
+
+    public long getCurrentTerm() {
+        return currentTerm;
+    }
+
+    public String getCurrentLeader() {
+        return currentLeader;
+    }
+
+    public String getLocalId() {
+        return config.getLocalId();
+    }
+
     // Подтверждение команды клиента
     public CompletableFuture<byte[]> submitCommand(byte[] command) {
         synchronized (this) {
