@@ -44,7 +44,7 @@
 
 - `src/main/java/org/example/`
   - `kv/`
-    - `KeyValueCommand.java` — команды для KV-хранилища (PUT, DELETE)
+    - `KeyValueCommand.java` — команды для KV-хранилища (PUT, GET, DELETE)
     - `KeyValueResult.java` — результат выполнения команд
     - `KeyValueStateMachine.java` — бизнес-логика state machine
   - `raft/`
